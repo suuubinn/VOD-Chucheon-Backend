@@ -1,0 +1,331 @@
+{% extends 'main_base.html' %}
+{% block content %}
+    <html>
+    <head>
+        <meta charset="utf-8"/>
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <title>Netflix</title>
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <script defer src="https://use.fontawesome.com/releases/v5.1.0/js/all.js"
+                integrity="sha384-3LK/3kTpDE/Pkp8gTNp2gR/2gOiwQ6QaO7Td0zV76UFJVhqLl4Vl3KL1We6q6wR9"
+                crossorigin="anonymous"></script>
+
+        <script src="main.js"></script>
+        <style>
+            html {
+                scroll-behavior: smooth;
+            }
+
+            body {
+                margin: 0;
+                background-color: #000;
+            }
+
+            h1 {
+                padding-left: 20px;
+                font-size: 200%;
+                padding-top: 60px;
+                transition: 1.0s;
+            }
+
+            h1:hover {
+                font-size: 300%;
+            }
+
+            .wrapper {
+                display: grid;
+                grid-template-columns: repeat(3, 100%);
+                overflow: hidden;
+                scroll-behavior: smooth;
+            }
+
+            .wrapper section {
+                width: 100%;
+                position: relative;
+                display: grid;
+                grid-template-columns: repeat(5, auto);
+                margin: 20px 0;
+            }
+
+            .wrapper section .item {
+                width: 200px;
+                margin-left: 15%;
+                padding: 0 2px;
+                transition: 1.0s all;
+            }
+
+            .wrapper section .item a {
+                width: 200px;
+                margin-left: 5%;
+                padding: 0 2px;
+                transition: 2.0s all;
+                position: initial;
+            }
+
+            .wrapper section .item:hover {
+                margin: 0 40px;
+                transform: scale(1.2);
+            }
+
+            .wrapper section .item:hover a {
+                width: 200px;
+                margin-left: 5%;
+                padding: 0 2px;
+                transition: 0.5s all;
+                position: initial;
+            }
+
+            .wrapper section a {
+                position: absolute;
+                color: #fff;
+                text-decoration: none;
+                font-size: 6em;
+                background: black;
+                width: 80px;
+                padding: 20px;
+                text-align: center;
+                z-index: 1;
+            }
+
+            .wrapper section a:nth-of-type(1) {
+                padding-left: 0;
+                top: 15%;
+                bottom: 0;
+                left: 0;
+                background: linear-gradient(-90deg, rgba(0, 0, 0, 0) 0%, black 100%);
+            }
+
+            .wrapper section a:nth-of-type(2) {
+                padding-right: 0;
+                top: 15%;
+                bottom: 0;
+                right: 0;
+                background: linear-gradient(90deg, rgba(0, 0, 0, 0) 0%, black 100%);
+            }
+
+
+
+            @media only screen and (max-width: 600px) {
+                a.arrow__btn {
+                    display: none;
+                }
+            }
+            .video-box {
+                position: absolute;
+                left: 0;
+                top: 0;
+
+                width: 100%;
+                z-index: 1;
+            }
+
+            .video-box video{
+
+
+                object-fit: fill;
+
+                width: 100%;
+            }
+            .item:hover {
+
+            }
+            #hidden-video {
+                width: 330px;
+                height: 250px;
+                position: absolute;
+                display: none;
+                border : 1px solid yellow;
+
+            }
+            #hidden-video video {
+                width: 330px;
+                border-radius: 30px;
+            }
+
+        </style>
+    </head>
+
+    <body>
+
+  
+<!-- 
+    <div class="video-box">
+
+        <video id="hohwan" src="https://fuck-sparta.s3.ap-northeast-2.amazonaws.com/video1.mp4" loop="loop" autoplay muted controls>
+        </video>
+    </div> -->
+
+
+    <h1 id="myList">가장 인기있는 컨텐츠 Top 10</h1>
+    <div class="wrapper">
+        <section id="section1">
+            <a href="#section2" class="arrow__btn">‹</a>
+            {% for movie in top10_list|slice:":5" %}
+                <div class="item">
+                    <img src="https://tekken.s3.ap-northeast-2.amazonaws.com/movies/{{ movie.title }}.jpg"
+                         alt="{{ movie.title }}" title="{{ movie.title }}" id = "{{movie.id}}" onclick="select_movie_modal(this.title, this.id); view({{ user.id }},{{ movie.id }},{{ movie.genre }});">
+                </div>
+            {% endfor %}
+            <a href="#section2" class="arrow__btn">›</a>
+        </section>
+        <section id="section2">
+            <a href="#section1" class="arrow__btn">‹</a>
+            {% for movie in top10_list|slice:"5:10" %}
+                <div class="item">
+                   <img src="https://tekken.s3.ap-northeast-2.amazonaws.com/movies/{{ movie.title }}.jpg"
+                            alt="{{ movie.title }}" title="{{ movie.title }}" id = "{{movie.id}}" onclick="select_movie_modal(this.title, this.id); view({{ user.id }},{{ movie.id }},{{ movie.genre }});">
+                </div>
+            {% endfor %}
+            <a href="#section1" class="arrow__btn">›</a>
+        </section>
+    </div>
+
+    <h1 id="myList">{{ user.nickname }}님의 취향과 비슷한 영화</h1>
+     <div class="wrapper">
+        <section id="section4">
+            <a href="#section5" class="arrow__btn">‹</a>
+            {% for movie in movie_result_list|slice:":5" %}
+                <div class="item">
+                    <img src="https://tekken.s3.ap-northeast-2.amazonaws.com/movies/{{ movie.title }}.jpg"
+                         alt="{{ movie.title }}" title="{{ movie.title }}" id = "{{movie.id}}" onclick="select_movie_modal(this.title, this.id); view({{ user.id }},{{ movie.id }},{{ movie.genre }});">
+                </div>
+            {% endfor %}
+            <a href="#section5" class="arrow__btn">›</a>
+        </section>
+        <section id="section5">
+            <a href="#section4" class="arrow__btn">‹</a>
+            {% for movie in movie_result_list|slice:"5:" %}
+                <div class="item">
+                    <img src="https://tekken.s3.ap-northeast-2.amazonaws.com/movies/{{ movie.title }}.jpg"
+                         alt="{{ movie.title }}" title="{{ movie.title }}" id = "{{movie.id}}" onclick="select_movie_modal(this.title, this.id); view({{ user.id }},{{ movie.id }},{{ movie.genre }});">
+                </div>
+            {% endfor %}
+            <a href="#section4" class="arrow__btn">›</a>
+        </section>
+    </div>
+
+    <h1 id="myList">{{ most_rank.0 }}</h1>
+    <div class="wrapper">
+        <section id="section6">
+            <a href="#section7" class="arrow__btn">‹</a>
+            {% for movie in genre1_list|slice:":5" %}
+                <div class="item">
+                    <img src="https://tekken.s3.ap-northeast-2.amazonaws.com/movies/{{ movie.title }}.jpg"
+                         alt="{{ movie.title }}" title="{{ movie.title }}" id = "{{movie.id}}" onclick="select_movie_modal(this.title, this.id); view({{ user.id }},{{ movie.id }},{{ movie.genre }});">
+                </div>
+            {% endfor %}
+            <a href="#section7" class="arrow__btn">›</a>
+        </section>
+        <section id="section7">
+            <a href="#section6" class="arrow__btn">‹</a>
+            {% for movie in genre1_list|slice:"5:10" %}
+                <div class="item">
+                    <img src="https://tekken.s3.ap-northeast-2.amazonaws.com/movies/{{ movie.title }}.jpg"
+                         alt="{{ movie.title }}" title="{{ movie.title }}" id = "{{movie.id}}" onclick="select_movie_modal(this.title, this.id); view({{ user.id }},{{ movie.id }},{{ movie.genre }});">
+                </div>
+            {% endfor %}
+            <a href="#section6" class="arrow__btn">›</a>
+        </section>
+    </div>
+
+    <h1 id="myList">{{ most_rank.1 }}</h1>
+    <div class="wrapper">
+        <section id="section8">
+            <a href="#section9" class="arrow__btn">‹</a>
+            {% for movie in genre2_list|slice:":5" %}
+                <div class="item">
+                        <img src="https://tekken.s3.ap-northeast-2.amazonaws.com/movies/{{ movie.title }}.jpg"
+                             alt="{{ movie.title }}" title="{{ movie.title }}" id = "{{movie.id}}" onclick="select_movie_modal(this.title, this.id); view({{ user.id }},{{ movie.id }},{{ movie.genre }});">
+                </div>
+            {% endfor %}
+            <a href="#section9" class="arrow__btn">›</a>
+        </section>
+        <section id="section9">
+            <a href="#section8" class="arrow__btn">‹</a>
+            {% for movie in genre2_list|slice:"5:10" %}
+                <div class="item">
+                    <img src="https://tekken.s3.ap-northeast-2.amazonaws.com/movies/{{ movie.title }}.jpg"
+                         alt="{{ movie.title }}" title="{{ movie.title }}" id = "{{movie.id}}" onclick="select_movie_modal(this.title, this.id); view({{ user.id }},{{ movie.id }},{{ movie.genre }});">
+                </div>
+            {% endfor %}
+            <a href="#section8" class="arrow__btn">›</a>
+        </section>
+    </div>
+
+    <h1 id="myList">{{ user.nickname }}님의 세대 영화 추천</h1>
+    <div class="wrapper">
+        <section id="section10">
+            <a href="#section11" class="arrow__btn">‹</a>
+            {% for movie in age_list|slice:":5" %}
+                <div class="item">
+                    <img src="https://tekken.s3.ap-northeast-2.amazonaws.com/movies/{{ movie.title }}.jpg"
+                         alt="{{ movie.title }}" title="{{ movie.title }}" id = "{{movie.id}}" onclick="select_movie_modal(this.title, this.id); view({{ user.id }},{{ movie.id }},{{ movie.genre }});">
+                </div>
+            {% endfor %}
+            <a href="#section11" class="arrow__btn">›</a>
+        </section>
+        <section id="section11">
+            <a href="#section10" class="arrow__btn">‹</a>
+            {% for movie in age_list|slice:"5:10" %}
+                <div class="item">
+                    <img src="https://tekken.s3.ap-northeast-2.amazonaws.com/movies/{{ movie.title }}.jpg"
+                         alt="{{ movie.title }}" title="{{ movie.title }}" id = "{{movie.id}}" onclick="select_movie_modal(this.title, this.id); view({{ user.id }},{{ movie.id }},{{ movie.genre }});">
+                </div>
+            {% endfor %}
+            <a href="#section10" class="arrow__btn">›</a>
+        </section>
+    </div>
+    {% include 'main/detail.html' %}
+{#    <div id="hidden-video" >#}
+{#        <video src="" muted autoplay ></video>#}
+{#    </div>#}
+{% endblock %}
+
+{% block script %}
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.7.0/chart.min.js"></script>
+    <script>
+
+        
+        function view(user_id, mv_id, genre) {
+            $.ajax({
+                type: 'POST',
+                url: `{% url 'view' %}`,
+                headers: {'X-CSRFTOKEN': '{{ csrf_token }}'},
+                datatype: 'json',
+                data: {
+                    'user_id' : user_id,
+                    'movie_id': mv_id,
+                    'genre': genre
+                },
+                success: function (response){
+                }
+            });
+        }
+        $(document).ready(function (){
+            $("#hohwan").css({
+                'height': ($(".showcase").height() + 'px')
+            });
+        })
+        $(window).resize(function() {
+            console.log('hi')
+            $("#hohwan").css({
+                'height': ($(".showcase").height() + 'px')
+            });
+        });
+         $('.item img').mouseenter(function () {
+
+            console.log($(this).offset().top)
+            console.log($(this).offset().left)
+            $('#hidden-video').css({
+                display : 'block',
+                top : $(this).offset().top -50,
+                left : $(this).offset().left -70
+            })
+            $('#hidden-video video')[0].load().src = "https://fuck-sparta.s3.ap-northeast-2.amazonaws.com/video1.mp4"
+            $('#hidden-video video')[0].src = "https://fuck-sparta.s3.ap-northeast-2.amazonaws.com/video1.mp4"
+        }); 
+
+    </script>
+
+{% endblock %}
