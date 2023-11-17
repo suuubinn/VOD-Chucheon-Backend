@@ -1,0 +1,249 @@
+{% extends 'base.html' %}
+{% block content %}
+    <html>
+    <head>
+        <style>
+             .showcase {
+                z-index: 0;
+            }
+            #container {
+                position: absolute;
+                top: 12%;
+                left: 5%;
+            }
+            .main-container {
+                padding: 50px;
+            }
+
+            .box {
+                display: grid;
+                grid-gap: 20px;
+                grid-template-columns: repeat(6, minmax(100px, 1fr));
+            }
+
+            .box a {
+                transition: transform .3s;
+            }
+
+            .box img:hover {
+                transition: transform .3s;
+                -ms-transform: scale(1.4);
+                -webkit-transform: scale(1.4);
+                transform: scale(1.4);
+            }
+
+            .box img {
+                border-radius: 2px;
+            }
+
+            /* LINKS */
+            .link {
+                padding: 50px;
+            }
+
+            .sub-links ul {
+                list-style: none;
+                padding: 0;
+                display: grid;
+                grid-gap: 20px;
+                grid-template-columns: repeat(4, 1fr);
+            }
+
+            .sub-links a {
+                color: var(--dark);
+                text-decoration: none;
+            }
+
+            .sub-links a:hover {
+                color: var(--dark);
+                text-decoration: underline;
+            }
+
+            .logos a {
+                padding: 10px;
+            }
+
+            .logo {
+                color: var(--dark);
+            }
+
+            /* MEDIA QUERIES */
+
+            @media (max-width: 900px) {
+
+                header {
+                    display: grid;
+                    grid-gap: 20px;
+                    grid-template-columns: repeat(2, 1fr);
+                    grid-template-areas:"nt nt nt  .  .  . sb . . . ""mn mn mn mn mn mn  mn mn mn mn";
+                }
+
+                .box {
+                    display: grid;
+                    grid-gap: 20px;
+                    grid-template-columns: repeat(4, minmax(100px, 1fr));
+                }
+
+            }
+
+            @media (max-width: 700px) {
+
+                header {
+                    display: grid;
+                    grid-gap: 20px;
+                    grid-template-columns: repeat(2, 1fr);
+                    grid-template-areas:"nt nt nt  .  .  . sb . . . ""mn mn mn mn mn mn  mn mn mn mn";
+                }
+
+                .box {
+                    display: grid;
+                    grid-gap: 20px;
+                    grid-template-columns: repeat(3, minmax(100px, 1fr));
+                }
+
+                .sub-links ul {
+                    display: grid;
+                    grid-gap: 20px;
+                    grid-template-columns: repeat(3, 1fr);
+                }
+
+            }
+
+            @media (max-width: 500px) {
+
+                .wrapper {
+                    font-size: 15px;
+                }
+
+                header {
+                    margin: 0;
+                    padding: 20px 0 0 0;
+                    position: static;
+                    display: grid;
+                    grid-gap: 20px;
+                    grid-template-columns: repeat(1, 1fr);
+                    grid-template-areas:
+    "nt"
+    "mn"
+    "sb";
+                    text-align: center;
+                }
+
+                .netflixLogo {
+                    max-width: 100%;
+                    margin: auto;
+                    padding-right: 20px;
+                }
+
+                .main-nav {
+                    display: grid;
+                    grid-gap: 0px;
+                    grid-template-columns: repeat(1, 1fr);
+                    text-align: center;
+                }
+
+                h1 {
+                    text-align: center;
+                    font-size: 18px;
+                }
+
+
+                .box {
+                    display: grid;
+                    grid-gap: 20px;
+                    grid-template-columns: repeat(1, 1fr);
+                    text-align: center;
+                }
+
+                .box a:hover {
+                    transition: transform .3s;
+                    -ms-transform: scale(1);
+                    -webkit-transform: scale(1);
+                    transform: scale(1.2);
+                }
+
+                .logos {
+                    display: grid;
+                    grid-gap: 20px;
+                    grid-template-columns: repeat(2, 1fr);
+                    text-align: center;
+                }
+
+                .sub-links ul {
+                    display: grid;
+                    grid-gap: 20px;
+                    grid-template-columns: repeat(1, 1fr);
+                    text-align: center;
+                    font-size: 15px;
+                }
+            }
+        </style>
+    </head>
+    <div id="container">
+        <h1>영화</h1>
+        <div class="btn-group">
+            <button type="button" class="btn btn-danger dropdown-toggle" data-bs-toggle="dropdown"
+                    aria-expanded="false">장르 선택
+            </button>
+            <ul class="dropdown-menu">
+                <li><a class="dropdown-item" href="/movie/0">가족</a></li>
+                <li><a class="dropdown-item" href="/movie/1">공포(호러)</a></li>
+                <li><a class="dropdown-item" href="/movie/2">다큐멘터리</a></li>
+                <li><a class="dropdown-item" href="/movie/3">드라마</a></li>
+                <li><a class="dropdown-item" href="/movie/4">멜로/로맨스</a></li>
+                <li><a class="dropdown-item" href="/movie/5">뮤지컬</a></li>
+                <li><a class="dropdown-item" href="/movie/6">미스터리</a></li>
+                <li><a class="dropdown-item" href="/movie/7">범죄</a></li>
+                <li><a class="dropdown-item" href="/movie/8">사극</a></li>
+                <li><a class="dropdown-item" href="/movie/9">서부극(웨스턴)</a></li>
+                <li><a class="dropdown-item" href="/movie/10">성인물(에로)</a></li>
+                <li><a class="dropdown-item" href="/movie/11">스릴러</a></li>
+                <li><a class="dropdown-item" href="/movie/12">애니메이션</a></li>
+                <li><a class="dropdown-item" href="/movie/13">액션</a></li>
+                <li><a class="dropdown-item" href="/movie/14">어드벤처</a></li>
+                <li><a class="dropdown-item" href="/movie/15">전쟁</a></li>
+                <li><a class="dropdown-item" href="/movie/16">코미디</a></li>
+                <li><a class="dropdown-item" href="/movie/17">판타지</a></li>
+                <li><a class="dropdown-item" href="/movie/18">SF</a></li>
+
+            </ul>
+        </div>
+    </div>
+
+
+
+    <section class="main-container" >
+    <div class="location" id="home">
+        <h1 id="home">{{ name }} 영화</h1>
+        <div class="box">
+            {% for movie in movie_list %}
+                <img src="https://tekken.s3.ap-northeast-2.amazonaws.com/movies/{{ movie.title }}.jpg"
+                     alt="{{ movie.title }}" title="{{ movie.title }}" id="{{ movie.id }}"
+                     onclick="select_movie_modal(this.title, this.id); view({{ user.id }},{{ movie.id }},{{ movie.genre }});">
+            {% endfor %}
+        </div>
+    </div>
+    </section>
+    </html>
+    {% include 'main/detail.html' %}
+{% endblock %}
+
+{% block script %}
+    <script>
+        function view(user_id, mv_id, genre) {
+            $.ajax({
+                type: 'POST',
+                url: `{% url 'view' %}`,
+                headers: {'X-CSRFTOKEN': '{{ csrf_token }}'},
+                datatype: 'json',
+                data: {
+                    'user_id' : user_id,
+                    'movie_id': mv_id,
+                    'genre': genre
+                },
+                success: function (response){
+                }
+            });
+        }
+    </script>
+{% endblock %}

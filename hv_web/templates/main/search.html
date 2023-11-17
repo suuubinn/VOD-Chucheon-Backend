@@ -1,0 +1,111 @@
+{% extends 'base.html' %}
+{% block content %}
+    <html>
+    <head>
+        <style>
+             .footer {
+                    display: none;
+                }
+            .showcase::after {
+                background: rgba(0, 0, 0, 0);
+
+            }
+            .showcase {
+                z-index: 0;
+            }
+            .movies{
+
+                display: flex;
+                flex-wrap: wrap;
+                justify-content: space-around;
+                margin-bottom: 20px;
+
+            }
+            .movie {
+                margin: 15px;
+            }
+            .movie img {
+                width: 200px;
+                height: 300px;
+                border-radius: 10px;
+                box-shadow: 3px 1px 1px rgba(0,0,0,0.5);
+            }
+            .search-wrapper {
+
+                position: absolute;
+                top: 15%;
+                left: 50%;
+                transform: translate(-50%,0);
+                width: 100%;
+            }
+            h3 {
+
+                text-align: center;
+                margin-bottom: 20px;
+            }
+            .genres {
+                display: flex;
+                flex-wrap: wrap;
+                justify-content: center;
+                margin-bottom: 20px;
+            }
+            .genres button {
+                margin: 5px;
+            }
+            .movie:hover {
+                    transform: translate(-2%,-2%);
+                    transition: 0.4s;
+                }
+        </style>
+    </head>
+    </html>
+    <div class="search-wrapper">
+        <div class="genres">
+            {% for genre in genres %}
+                <button  class="btn btn-rounded">
+                    <a href="/search/?keyword={{ genre }}">{{ genre }}</a>
+                </button>
+            {% endfor %}
+        </div>
+        <div class="movies">
+            {% for movie in movies %}
+                <div class="movie">
+                    <img src="https://tekken.s3.ap-northeast-2.amazonaws.com/movies/{{ movie.title }}.jpg"
+                         alt="{{ movie.title }}" title="{{ movie.title }}" id="{{ movie.id }}"
+                         onclick="select_movie_modal(this.title, this.id); view({{ user.id }},{{ movie.id }},{{ movie.genre }});">
+                </div>
+            {% endfor %}
+
+        </div>
+        <h3>
+            {% if movies.has_previous %}
+                <a href="?page={{ movies.previous_page_number }}&keyword={{ kw }}">이전</a>
+            {% endif %}
+            {{ movies.number }} / {{ movies.paginator.num_pages }}
+            {% if movies.has_next %}
+                <a href="?page={{ movies.next_page_number }}&keyword={{ kw }}">다음</a>
+            {% endif %}
+        </h3>
+    </div>
+{% include 'main/detail.html' %}
+{% endblock %}
+
+{% block script %}
+<script>
+    function view(user_id, mv_id, genre) {
+        $.ajax({
+            type: 'POST',
+            url: `{% url 'view' %}`,
+            headers: {'X-CSRFTOKEN': '{{ csrf_token }}'},
+            datatype: 'json',
+            data: {
+                'user_id' : user_id,
+                'movie_id': mv_id,
+                'genre': genre
+            },
+            success: function (response){
+            }
+        });
+    }
+</script>
+{% endblock %}
