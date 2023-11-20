@@ -16,7 +16,7 @@ env:
   ECS_SERVICE: VOD-Recommendation-Backend
   ECS_CLUSTER: VOD-Recommendation-Backend
   ECS_TASK_DEFINITION: ./task-definition.json
-  CONTAINER_NAME: jinstagram
+  CONTAINER_NAME: VOD-Recommendation-Backend
 
 jobs:
   build:
@@ -42,7 +42,7 @@ jobs:
       - name: Configure AWS Credentials
         uses: aws-actions/configure-aws-credentials@v4
         with:
-          role-to-assume: arn:aws:iam::207955846572:role/jinstagram-role
+          role-to-assume: arn:aws:iam::207955846572:role/VOD-Recommendation-Backend-github
           role-session-name: sampleSessionName
           aws-region: ap-northeast-2
 
