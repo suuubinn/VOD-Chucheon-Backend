@@ -83,7 +83,7 @@ DATABASES = {
         'ENGINE': 'django.db.backends.mysql',
         'NAME': "jintto",
         "USER":"jintto",
-        "PASSWORD":"jintto1234",
+        "PASSWORD":"${{secrets.AWS_RDS_PASSWORD}}",
         "HOST":"vod-recommendation-db.cakeuxdlscyg.ap-northeast-2.rds.amazonaws.com",
         "PORT":"3306"
 
