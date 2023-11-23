@@ -13,7 +13,7 @@ permissions:
 env:
   AWS_REGION: ap-northeast-2                   
   ECR_REPOSITORY: vod-recommendation-backend
-  ECS_SERVICE: VOD-Recommendation-Backend-service
+  ECS_SERVICE: VOD-Recommendation-Backend-Service
   ECS_CLUSTER: VOD-Recommendation-Backend
   ECS_TASK_DEFINITION: ./task-definition.json
   CONTAINER_NAME: VOD-Recommendation-Backend
