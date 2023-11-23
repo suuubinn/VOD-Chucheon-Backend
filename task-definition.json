@@ -1,5 +1,5 @@
 {
-    "taskDefinitionArn": "arn:aws:ecs:ap-northeast-2:207955846572:task-definition/VOD-Recommendation-Backend:2",
+    "taskDefinitionArn": "arn:aws:ecs:ap-northeast-2:207955846572:task-definition/VOD-Recommendation-Backend:10",
     "containerDefinitions": [
         {
             "name": "VOD-Recommendation-Backend",
@@ -15,10 +15,8 @@
             ],
             "essential": true,
             "environment": [],
-            "environmentFiles": [],
             "mountPoints": [],
             "volumesFrom": [],
-            "ulimits": [],
             "logConfiguration": {
                 "logDriver": "awslogs",
                 "options": {
@@ -26,15 +24,14 @@
                     "awslogs-group": "/ecs/VOD-Recommendation-Backend",
                     "awslogs-region": "ap-northeast-2",
                     "awslogs-stream-prefix": "ecs"
-                },
-                "secretOptions": []
+                }
             }
         }
     ],
     "family": "VOD-Recommendation-Backend",
     "executionRoleArn": "arn:aws:iam::207955846572:role/ecsTaskExecutionRole",
     "networkMode": "awsvpc",
-    "revision": 2,
+    "revision": 10,
     "volumes": [],
     "status": "ACTIVE",
     "requiresAttributes": [
@@ -77,7 +74,7 @@
         "cpuArchitecture": "X86_64",
         "operatingSystemFamily": "LINUX"
     },
-    "registeredAt": "2023-11-20T01:02:56.150Z",
-    "registeredBy": "arn:aws:iam::207955846572:root",
+    "registeredAt": "2023-11-21T02:22:59.319Z",
+    "registeredBy": "arn:aws:sts::207955846572:assumed-role/VOD-Recommendation-Backend-github/sampleSessionName",
     "tags": []
 }
