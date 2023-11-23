@@ -87,7 +87,7 @@ DATABASES = {
         'NAME': "jintto",
         "USER":"jintto",
         "PASSWORD":"jintto1234",
-        "HOST":"vod-recommendation-db.cakeuxdlscyg.ap-northeast-2.rds.amazonaws.com",
+        "HOST":"vod-recommendation-db2.cakeuxdlscyg.ap-northeast-2.rds.amazonaws.com",
         "PORT":"3306"
 
     }
