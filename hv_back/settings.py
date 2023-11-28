@@ -12,6 +12,7 @@ https://docs.djangoproject.com/en/4.2/ref/settings/
 
 from pathlib import Path
 from datetime import timedelta
+from settings_secret import SECRET_KEY, DATABASES
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -86,7 +87,7 @@ DATABASES = {
         'ENGINE': 'django.db.backends.mysql',
         'NAME': "jintto",
         "USER":"jintto",
-        "PASSWORD":"jintto1234",
+        "PASSWORD":"${{secrets.AWS_RDS_PASSWORD}}",
         "HOST":"vod-recommendation-db2.cakeuxdlscyg.ap-northeast-2.rds.amazonaws.com",
         "PORT":"3306"
 
