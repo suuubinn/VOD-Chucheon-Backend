@@ -1,9 +1,8 @@
+from .models import UserAuth
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
 from rest_framework_simplejwt.tokens import RefreshToken
-from .models import UserAuth
-from .serializers import UserAuthSerializer
 
 class LoginView(APIView):
     def post(self, request):
@@ -19,6 +18,7 @@ class LoginView(APIView):
             token = {
                 'refresh': str(refresh),
                 'access': str(refresh.access_token),
+                'subsr': subsr,
             }
 
 
