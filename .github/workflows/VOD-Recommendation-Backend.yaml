@@ -47,9 +47,6 @@ jobs:
           role-session-name: sampleSessionName
           aws-region: ap-northeast-2
 
-      - name: Database login
-        run: |
-          echo "Secret Token : ${{secrets.AWS_RDS_PASSWORD}}"
 
       - name: Login to Amazon ECR
         id: login-ecr
