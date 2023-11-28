@@ -1,8 +1,8 @@
 {
-    "taskDefinitionArn": "arn:aws:ecs:ap-northeast-2:207955846572:task-definition/VOD-Recommendation-Backend:10",
+    "taskDefinitionArn": "arn:aws:ecs:ap-northeast-2:207955846572:task-definition/vod-recommendation-backend:4",
     "containerDefinitions": [
         {
-            "name": "VOD-Recommendation-Backend",
+            "name": "vod-recommendation-backend",
             "cpu": 0,
             "portMappings": [
                 {
@@ -15,23 +15,26 @@
             ],
             "essential": true,
             "environment": [],
+            "environmentFiles": [],
             "mountPoints": [],
             "volumesFrom": [],
+            "ulimits": [],
             "logConfiguration": {
                 "logDriver": "awslogs",
                 "options": {
                     "awslogs-create-group": "true",
-                    "awslogs-group": "/ecs/VOD-Recommendation-Backend",
+                    "awslogs-group": "/ecs/vod-recommendation-backend",
                     "awslogs-region": "ap-northeast-2",
                     "awslogs-stream-prefix": "ecs"
-                }
+                },
+                "secretOptions": []
             }
         }
     ],
-    "family": "VOD-Recommendation-Backend",
+    "family": "vod-recommendation-backend",
     "executionRoleArn": "arn:aws:iam::207955846572:role/ecsTaskExecutionRole",
     "networkMode": "awsvpc",
-    "revision": 10,
+    "revision": 4,
     "volumes": [],
     "status": "ACTIVE",
     "requiresAttributes": [
@@ -68,13 +71,13 @@
     "requiresCompatibilities": [
         "FARGATE"
     ],
-    "cpu": "1024",
+    "cpu": "512",
     "memory": "3072",
     "runtimePlatform": {
         "cpuArchitecture": "X86_64",
         "operatingSystemFamily": "LINUX"
     },
-    "registeredAt": "2023-11-21T02:22:59.319Z",
-    "registeredBy": "arn:aws:sts::207955846572:assumed-role/VOD-Recommendation-Backend-github/sampleSessionName",
+    "registeredAt": "2023-11-28T05:36:54.651Z",
+    "registeredBy": "arn:aws:iam::207955846572:root",
     "tags": []
 }
