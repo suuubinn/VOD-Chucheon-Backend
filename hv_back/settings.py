@@ -12,7 +12,6 @@ https://docs.djangoproject.com/en/4.2/ref/settings/
 
 from pathlib import Path
 from datetime import timedelta
-#from settings_secret import SECRET_KEY, DATABASES
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -27,7 +26,7 @@ SECRET_KEY = 'django-insecure-)6cv^nunnw2f864i*#i7g1la@%vshwx8k4z9^dt(fsy+_)e-b!
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['*']
+ALLOWED_HOSTS = ['localhost']
 
 
 # Application definition
@@ -87,10 +86,9 @@ DATABASES = {
         'ENGINE': 'django.db.backends.mysql',
         'NAME': "jintto",
         "USER":"jintto",
-        "PASSWORD":"jintto1234",
-        "HOST":"vod-recommendation-db2.cakeuxdlscyg.ap-northeast-2.rds.amazonaws.com",
+        "PASSWORD":"jintto1130",
+        "HOST":"database-new-backenddb.ctcha5snygzq.us-east-1.rds.amazonaws.com",
         "PORT":"3306"
-
     }
 }
 
