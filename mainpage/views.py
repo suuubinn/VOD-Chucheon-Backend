@@ -13,7 +13,9 @@ import json
 from hv_back.utils import get_assets_by_time
 from hv_back.utils import get_programs_by_assets
 from hv_back.utils import get_server_time
-
+import ast
+# from hv_back.utils import load_recommendation_model
+# from django.utils import timezone
 
 # def read_data_from_s3(bucket_name, object_key):
 #     try:
@@ -29,11 +31,16 @@ from hv_back.utils import get_server_time
 #         print(f'Error reading data from S3: {e}')
 #         raise e
 
-def convert_none_to_null(value):
+def convert_none_to_null_1(value):
     if pd.isna(value):
         return None
     return value
 
+def convert_none_to_null(program):
+    for key, value in program.items():
+        if pd.isna(value):
+            program[key] = None
+    return program
 
 # 로컬로 데이터 읽는 코드
 def read_data_from_local(file_name):
@@ -63,7 +70,7 @@ class RecommendationView_1(View):
             print(f'top_assets, {top_assets}')
             selected_programs = get_programs_by_assets(top_assets)
             # result_data = selected_programs.to_dict('records')
-            result_data = selected_programs.apply(lambda x: x.map(convert_none_to_null)).to_dict('records')
+            result_data = selected_programs.apply(lambda x: x.map(convert_none_to_null_1)).to_dict('records')
 
 
             # for program in selected_programs:
@@ -153,6 +160,82 @@ class RecommendationView_2(View):
             return JsonResponse({'error': 'Internal Server Error'}, status=500)
         
 
+# @method_decorator(csrf_exempt, name='   dispatch')  # CSRF 토큰 무시/
+# class RecommendationView_3(View):
+#     def post(self, request):
+#         try:
+#             data = json.loads(request.body)
+#             subsr = data.get('subsr', None)
+#             print(f"Received subsr: {subsr}")
+#             if not subsr:
+#                 return JsonResponse({'error': 'subsr is required'}, status=400)
+#              # 현재 시간을 가져옵니다.
+#             current_time = timezone.now()
+#             # 이전 달을 계산하고 그 시간을 가져옵니다.
+#             previous_month = current_time - timezone.timedelta(days=current_time.day)
+#             current_month = current_time.strftime('%y%m')
+#             previous_month = previous_month.strftime('%m')
+#             recommendation_model = load_recommendation_model(f'baseline_model_{previous_month}{current_month}')
+#             if not programs:
+#                 return JsonResponse({'error': 'No programs available'}, status=404)
+#             num_programs_to_select = min(20, len(programs))
+#             selected_programs = programs if num_programs_to_select >= len(programs) else random.sample(programs, num_programs_to_select)
+#             # result_data = selected_programs
+#             result_data = [convert_none_to_null(program) for program in selected_programs]
+#             return JsonResponse({'data': result_data}, content_type='application/json')
+
+#         except Exception as e:
+#             logging.exception(f"Error in RecommendationView_2: {e}")
+#             return JsonResponse({'error': 'Internal Server Error'}, status=500)
+        
+        
+@method_decorator(csrf_exempt, name='dispatch')
+class RecommendationView_4(View):
+    def post(self, request):
+        try:
+            data = json.loads(request.body)
+            subsr = data.get('subsr', None)
+            print(f"Received subsr: {subsr}")
+            if not subsr:
+                return JsonResponse({'error': 'subsr is required'}, status=400)
+            
+            vod_log = read_data_from_local('vod_df.csv')
+            print(vod_log.head(1))
+            vod_log = vod_log[vod_log['subsr'].astype(str) == str(subsr)]
+            if vod_log.empty:
+                return JsonResponse({'error': 'No viewing history for the specified user'}, status=404)
+            
+            vod_log['datetime'] = pd.to_datetime(vod_log['date'] + ' ' + vod_log['time'])
+            asset_nm = vod_log.loc[vod_log['datetime'].idxmax(), 'asset_nm']
+            
+            cos_sim = read_data_from_local('contents_sim.csv')
+            if cos_sim is not None:
+                print(f"cos_sim not none!")
+                programs_str = cos_sim[cos_sim['asset_nm'] == asset_nm]['similar_assets'].iloc[0]
+                programs = ast.literal_eval(programs_str) if programs_str else []
+                
+                asset_df = read_data_from_local('asset_df.csv')
+                
+                # asset_df에서 asset_nm 값에 해당하는 데이터 찾기
+                asset_data = asset_df[asset_df['asset_nm'].isin(programs)]
+                
+                # 필요한 처리 (예: 데이터를 리스트로 변환)
+                selected_programs = asset_data.to_dict(orient='records')
+            else:
+                print(f"cos_sim is none")
+                selected_programs = []
+            
+            if not selected_programs:
+                return JsonResponse({'error': 'No programs available'}, status=404)
+            
+            num_programs_to_select = min(10, len(selected_programs))
+            result_data = [convert_none_to_null(program) for program in selected_programs[:num_programs_to_select]]
+            return JsonResponse({'data': result_data}, content_type='application/json')
+        except Exception as e:
+            logging.exception(f"Error in RecommendationView_2: {e}")
+            return JsonResponse({'error': 'Internal Server Error'}, status=500)
+
+
 
 @method_decorator(csrf_exempt, name='dispatch')
 class SearchVeiw(View):
@@ -172,7 +255,7 @@ class SearchVeiw(View):
                 selected_data = asset_df[asset_df['asset_nm'].str.contains(program_to_search)]
             except KeyError:
                 return JsonResponse({'error': 'Invalid filtering condition'}, status=400)
-            result_data = selected_data.where(pd.notna(selected_data), None).applymap(convert_none_to_null).to_dict('records')
+            result_data = selected_data.where(pd.notna(selected_data), None).applymap(convert_none_to_null_1).to_dict('records')
             return JsonResponse({'data': result_data})
         except json.JSONDecodeError:
             return JsonResponse({'error': 'Invalid JSON data'}, status=400)
@@ -199,7 +282,7 @@ class ProcessButtonClickView(View):
                 selected_data = asset_df[asset_df['category_h'] == button_text]
             except KeyError:
                 return JsonResponse({'error': 'Invalid filtering condition'}, status=400)
-            result_data = selected_data.where(pd.notna(selected_data), None).applymap(convert_none_to_null).to_dict('records')
+            result_data = selected_data.where(pd.notna(selected_data), None).applymap(convert_none_to_null_1).to_dict('records')
 
             return JsonResponse({'data': result_data})
         except json.JSONDecodeError:
