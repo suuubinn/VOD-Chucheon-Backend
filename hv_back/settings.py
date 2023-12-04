@@ -175,3 +175,6 @@ LOGGING = {
         'level': 'DEBUG',  # 필요에 따라 변경 가능
     },
 }
+
+MEDIA_ROOT = BASE_DIR / "media"
+MEDIA_URL = "/media/"

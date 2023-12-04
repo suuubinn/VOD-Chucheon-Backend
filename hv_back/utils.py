@@ -2,6 +2,9 @@ from django.utils import timezone
 import pandas as pd
 import logging
 import json
+import os
+import pickle
+from django.conf import settings
 
 #reco1 : 장고 서버시간
 def get_server_time():
@@ -36,3 +39,9 @@ def get_programs_by_assets(top_assets):
     except Exception as e:
         logging.exception(f"Error in get_programs_by_assets: {e}")
         return pd.DataFrame()
+
+# def load_recommendation_model(filename):
+#     media_path = os.path.join(settings.MEDIA_ROOT, f'{filename}.pkl')
+#     with open(media_path, 'rb') as file:
+#         recommendation_model = pickle.load(file)
+#     return recommendation_model
