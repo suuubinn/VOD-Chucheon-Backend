@@ -1,4 +1,4 @@
-#!C:\Users\USER\Documents\VOD-Recommendation-Backend.v2\myvenv\Scripts\python.exe
+#!C:\Users\USER\Desktop\hv_back\myvenv\Scripts\python.exe
 
 import sys
 import json
