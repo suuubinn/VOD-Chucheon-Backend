@@ -42,6 +42,10 @@ def get_programs_by_assets(top_assets):
 
 def load_recommendation_model(filename):
     media_path = os.path.join(settings.MEDIA_ROOT, f'{filename}.pkl')
-    with open(media_path, 'rb') as file:
-        recommendation_model = pickle.load(file)
-    return recommendation_model
+    try:
+        with open(media_path, 'rb') as file:
+            recommendation_model = pickle.load(file)
+        return recommendation_model
+    except Exception as e:
+        print(f"Error loading model from file: {e}")
+        return None

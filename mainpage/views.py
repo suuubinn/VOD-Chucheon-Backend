@@ -132,12 +132,19 @@ def get_random_programs(num_programs):
         return []
 
 
-def get_user_recommendations(subsr, vod_df, asset_df, model):
-    watched_assets = vod_df[vod_df['subsr'] == subsr]['asset_nm'].unique()
-    testset = [(subsr, asset, 0) for asset in asset_df['asset_nm'].unique() if asset not in watched_assets]
-    predictions = model.test(testset)
-    recommendations = [rec.iid for rec in sorted(predictions, key=lambda x: x.est, reverse=True)][:20]
-    return recommendations
+
+def get_user_recommendations(subsr, vod_df, asset_df, model, top_n=20):
+    all_assets = asset_df['asset_nm'].unique()
+    subsr_predictions = [model.predict(int(subsr), asset) for asset in all_assets]
+    watched_assets = vod_df[vod_df['subsr'].astype(str) == str(subsr)]['asset_nm'].unique()
+    rec_assets = [rec.iid for rec in sorted(subsr_predictions, key=lambda x: x.est, reverse=True)
+                  if rec.iid not in watched_assets][:top_n]
+    subsr_recommendations = pd.DataFrame({
+        'subsr': [subsr] * top_n,
+        'asset_nm': rec_assets
+    })
+    return subsr_recommendations
+
 
 @method_decorator(csrf_exempt, name='dispatch')  # CSRF 토큰 무시/
 class RecommendationView_2(View):
@@ -180,23 +187,27 @@ class RecommendationView_3(View):
             print(f"Received subsr: {subsr}")
             if not subsr:
                 return JsonResponse({'error': 'subsr is required'}, status=400)
-
+            
             current_time = timezone.now()
             # 4개월 전
             four_months_ago = current_time - timezone.timedelta(days=120)
             four_months_ago_month = four_months_ago.strftime('%m')
-
             # 3개월 전
             three_months_ago = current_time - timezone.timedelta(days=90)
             three_months_ago_month = three_months_ago.strftime('%m')
-
-            recommendation_model = load_recommendation_model(f'baseline_model_{four_months_ago_month}{three_months_ago_month}')
+            
+            
+            model_filename = f'baseline_model_{four_months_ago_month}{three_months_ago_month}'
+            recommendation_model = load_recommendation_model(model_filename)
+            if recommendation_model is None:
+                return JsonResponse({'error': 'Failed to load the recommendation model'}, status=500)
             vod_df=read_data_from_local('vod_df.csv')
             asset_df=read_data_from_local('asset_df.csv')
-            programs = get_user_recommendations(subsr, vod_df, asset_df, recommendation_model)
-            if not programs:
+            programs = get_user_recommendations(subsr=subsr, vod_df=vod_df, asset_df=asset_df, model=recommendation_model)
+            if programs.empty:
                 return JsonResponse({'error': 'No programs available'}, status=404)
-            recommended_programs_df = asset_df[asset_df['asset_nm'].isin(programs)]
+            
+            recommended_programs_df = asset_df.loc[asset_df['asset_nm'].isin(programs['asset_nm'])]
             result_data = recommended_programs_df.to_dict(orient='records')
             result_data = [convert_none_to_null(program) for program in result_data]
             return JsonResponse({'data': result_data}, content_type='application/json')
