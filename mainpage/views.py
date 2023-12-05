@@ -14,8 +14,12 @@ from hv_back.utils import get_assets_by_time
 from hv_back.utils import get_programs_by_assets
 from hv_back.utils import get_server_time
 import ast
-# from hv_back.utils import load_recommendation_model
-# from django.utils import timezone
+from hv_back.utils import load_recommendation_model
+from django.utils import timezone
+from surprise import Dataset, Reader
+from surprise.model_selection import train_test_split
+from surprise import BaselineOnly
+from surprise import accuracy
 
 # def read_data_from_s3(bucket_name, object_key):
 #     try:
@@ -128,6 +132,13 @@ def get_random_programs(num_programs):
         return []
 
 
+def get_user_recommendations(subsr, vod_df, asset_df, model):
+    watched_assets = vod_df[vod_df['subsr'] == subsr]['asset_nm'].unique()
+    testset = [(subsr, asset, 0) for asset in asset_df['asset_nm'].unique() if asset not in watched_assets]
+    predictions = model.test(testset)
+    recommendations = [rec.iid for rec in sorted(predictions, key=lambda x: x.est, reverse=True)][:20]
+    return recommendations
+
 @method_decorator(csrf_exempt, name='dispatch')  # CSRF 토큰 무시/
 class RecommendationView_2(View):
     def post(self, request):
@@ -160,33 +171,39 @@ class RecommendationView_2(View):
             return JsonResponse({'error': 'Internal Server Error'}, status=500)
         
 
-# @method_decorator(csrf_exempt, name='   dispatch')  # CSRF 토큰 무시/
-# class RecommendationView_3(View):
-#     def post(self, request):
-#         try:
-#             data = json.loads(request.body)
-#             subsr = data.get('subsr', None)
-#             print(f"Received subsr: {subsr}")
-#             if not subsr:
-#                 return JsonResponse({'error': 'subsr is required'}, status=400)
-#              # 현재 시간을 가져옵니다.
-#             current_time = timezone.now()
-#             # 이전 달을 계산하고 그 시간을 가져옵니다.
-#             previous_month = current_time - timezone.timedelta(days=current_time.day)
-#             current_month = current_time.strftime('%y%m')
-#             previous_month = previous_month.strftime('%m')
-#             recommendation_model = load_recommendation_model(f'baseline_model_{previous_month}{current_month}')
-#             if not programs:
-#                 return JsonResponse({'error': 'No programs available'}, status=404)
-#             num_programs_to_select = min(20, len(programs))
-#             selected_programs = programs if num_programs_to_select >= len(programs) else random.sample(programs, num_programs_to_select)
-#             # result_data = selected_programs
-#             result_data = [convert_none_to_null(program) for program in selected_programs]
-#             return JsonResponse({'data': result_data}, content_type='application/json')
+@method_decorator(csrf_exempt, name='dispatch')  # CSRF 토큰 무시/
+class RecommendationView_3(View):
+    def post(self, request):
+        try:
+            data = json.loads(request.body)
+            subsr = data.get('subsr', None)
+            print(f"Received subsr: {subsr}")
+            if not subsr:
+                return JsonResponse({'error': 'subsr is required'}, status=400)
 
-#         except Exception as e:
-#             logging.exception(f"Error in RecommendationView_2: {e}")
-#             return JsonResponse({'error': 'Internal Server Error'}, status=500)
+            current_time = timezone.now()
+            # 4개월 전
+            four_months_ago = current_time - timezone.timedelta(days=120)
+            four_months_ago_month = four_months_ago.strftime('%m')
+
+            # 3개월 전
+            three_months_ago = current_time - timezone.timedelta(days=90)
+            three_months_ago_month = three_months_ago.strftime('%m')
+
+            recommendation_model = load_recommendation_model(f'baseline_model_{four_months_ago_month}{three_months_ago_month}')
+            vod_df=read_data_from_local('vod_df.csv')
+            asset_df=read_data_from_local('asset_df.csv')
+            programs = get_user_recommendations(subsr, vod_df, asset_df, recommendation_model)
+            if not programs:
+                return JsonResponse({'error': 'No programs available'}, status=404)
+            recommended_programs_df = asset_df[asset_df['asset_nm'].isin(programs)]
+            result_data = recommended_programs_df.to_dict(orient='records')
+            result_data = [convert_none_to_null(program) for program in result_data]
+            return JsonResponse({'data': result_data}, content_type='application/json')
+
+        except Exception as e:
+            logging.exception(f"Error in RecommendationView_2: {e}")
+            return JsonResponse({'error': 'Internal Server Error'}, status=500)
         
         
 @method_decorator(csrf_exempt, name='dispatch')

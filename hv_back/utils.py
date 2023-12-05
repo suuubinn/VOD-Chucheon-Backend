@@ -40,8 +40,8 @@ def get_programs_by_assets(top_assets):
         logging.exception(f"Error in get_programs_by_assets: {e}")
         return pd.DataFrame()
 
-# def load_recommendation_model(filename):
-#     media_path = os.path.join(settings.MEDIA_ROOT, f'{filename}.pkl')
-#     with open(media_path, 'rb') as file:
-#         recommendation_model = pickle.load(file)
-#     return recommendation_model
+def load_recommendation_model(filename):
+    media_path = os.path.join(settings.MEDIA_ROOT, f'{filename}.pkl')
+    with open(media_path, 'rb') as file:
+        recommendation_model = pickle.load(file)
+    return recommendation_model
