@@ -1,12 +1,12 @@
 {
-    "taskDefinitionArn": "arn:aws:ecs:ap-northeast-2:207955846572:task-definition/vod-recommendation-backend:4",
+    "taskDefinitionArn": "arn:aws:ecs:ap-northeast-2:813621738328:task-definition/jinttobacktask:5",
     "containerDefinitions": [
         {
-            "name": "vod-recommendation-backend",
+            "name": "jinttodjango",
             "cpu": 0,
             "portMappings": [
                 {
-                    "name": "vod-recommendation-backend-80-tcp",
+                    "name": "jinttodjango-80-tcp",
                     "containerPort": 80,
                     "hostPort": 80,
                     "protocol": "tcp",
@@ -23,7 +23,7 @@
                 "logDriver": "awslogs",
                 "options": {
                     "awslogs-create-group": "true",
-                    "awslogs-group": "/ecs/vod-recommendation-backend",
+                    "awslogs-group": "/ecs/jinttobacktask",
                     "awslogs-region": "ap-northeast-2",
                     "awslogs-stream-prefix": "ecs"
                 },
@@ -31,10 +31,10 @@
             }
         }
     ],
-    "family": "vod-recommendation-backend",
-    "executionRoleArn": "arn:aws:iam::207955846572:role/ecsTaskExecutionRole",
+    "family": "jinttobacktask",
+    "executionRoleArn": "arn:aws:iam::813621738328:role/ecsTaskExecutionRole",
     "networkMode": "awsvpc",
-    "revision": 4,
+    "revision": 5,
     "volumes": [],
     "status": "ACTIVE",
     "requiresAttributes": [
@@ -71,13 +71,13 @@
     "requiresCompatibilities": [
         "FARGATE"
     ],
-    "cpu": "512",
+    "cpu": "1024",
     "memory": "3072",
     "runtimePlatform": {
         "cpuArchitecture": "X86_64",
         "operatingSystemFamily": "LINUX"
     },
-    "registeredAt": "2023-11-28T05:36:54.651Z",
-    "registeredBy": "arn:aws:iam::207955846572:root",
+    "registeredAt": "2023-12-13T02:39:11.200Z",
+    "registeredBy": "arn:aws:iam::813621738328:root",
     "tags": []
 }
