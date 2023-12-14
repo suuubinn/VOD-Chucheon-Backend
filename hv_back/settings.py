@@ -138,7 +138,9 @@ STATICFILES_DIRS = [
 # https://docs.djangoproject.com/en/4.2/ref/settings/#default-auto-field
 CORS_ALLOWED_ORIGINS = [
     "http://localhost:3000",
-    "http://vod-recommendation-frontend.s3-website.ap-northeast-2.amazonaws.com"  # React 앱이 실행되는 주소
+    "http://vod-recommendation-frontend.s3-website.ap-northeast-2.amazonaws.com",  # React 앱이 실행되는 주소
+    "https://front.jinttoteam.com"
+
 ]
 
 CORS_ALLOW_CREDENTIALS = True
