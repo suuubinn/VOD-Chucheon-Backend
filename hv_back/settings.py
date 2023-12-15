@@ -12,6 +12,7 @@ https://docs.djangoproject.com/en/4.2/ref/settings/
 
 from pathlib import Path
 from datetime import timedelta
+import os
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -21,11 +22,13 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # See https://docs.djangoproject.com/en/4.2/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-)6cv^nunnw2f864i*#i7g1la@%vshwx8k4z9^dt(fsy+_)e-b!'
+# git action 시크릿으로 넣어야될 것
+SECRET_KEY = os.environ.get('SECRET_KEY')
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
+# 배포 변경 후 추후 우리 도메인만
 ALLOWED_HOSTS = ['*']
 
 
@@ -41,6 +44,7 @@ INSTALLED_APPS = [
     'bootstrap4',
     'mainpage',
     'landing',
+    'core',
     'corsheaders',
     'rest_framework',
     'rest_framework_simplejwt',
@@ -55,6 +59,11 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+]
+
+CORS_ALLOWED_ORIGINS = [
+    "http://localhost:3000", 
+    "https://front.jinttoteam.com"  # React 앱이 실행되는 주소
 ]
 
 ROOT_URLCONF = 'hv_back.urls'
@@ -136,12 +145,7 @@ STATICFILES_DIRS = [
 ]
 # Default primary key field type
 # https://docs.djangoproject.com/en/4.2/ref/settings/#default-auto-field
-CORS_ALLOWED_ORIGINS = [
-    "http://localhost:3000",
-    "http://vod-recommendation-frontend.s3-website.ap-northeast-2.amazonaws.com",  # React 앱이 실행되는 주소
-    "https://front.jinttoteam.com"
 
-]
 
 CORS_ALLOW_CREDENTIALS = True
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
@@ -152,17 +156,21 @@ REST_FRAMEWORK = {
     ],
 }
 
+JWT_SECRET_KEY = os.environ.get('JWT_SECRET_KEY')
+
 SIMPLE_JWT = {
     'JWT_SECRET_KEY': 'Lw5Syaog9lZb32MpP4G117_e1AXKCOZyrr9MtHj40Cs',  # 생성된 비밀 키로 교체
     'ACCESS_TOKEN_LIFETIME': timedelta(minutes=30),
     'REFRESH_TOKEN_LIFETIME': timedelta(days=7),
 }
 
-# AWS_ACCESS_KEY_ID=${{secrets.AWS_ACCESS_KEY}}
-# AWS_SECRET_ACCESS_KEY=${{secrets.AWS_SECRET_ACCESS_KEY}}
-# AWS_S3_REGION_NAME='ap-northeast-2'
-# AWS_S3_CUSTOM_DOMAIN='vod-recommendation-dataset.ap-northeast-2'
-# PROGRAM_OBJECT_KEY = 'preprocessed data/asset_nm.csv'
+# AWS S3 설정
+# git action 시크릿으로 넣어야될 것
+AWS_ACCESS_KEY_ID = os.environ.get('AWS_ACCESS_KEY_ID')
+AWS_SECRET_ACCESS_KEY =  os.environ.get('AWS_SECRET_ACCESS_KEY')
+AWS_STORAGE_BUCKET_NAME = 'jintto-s3-backend'
+AWS_S3_CUSTOM_DOMAIN = f'{AWS_STORAGE_BUCKET_NAME}.s3.amazonaws.com'
+AWS_S3_REGION = 'ap-northeast-2'
 
 LOGGING = {
     'version': 1,
