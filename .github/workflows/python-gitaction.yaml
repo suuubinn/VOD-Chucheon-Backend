@@ -31,16 +31,26 @@ jobs:
         run: |
           python -m pip install --upgrade pip
 
+
       - name: Run Django Migrations
         run: python manage.py migrate
-        # env:
-        #   SECRET_KEY: ${{secrets.SECRET_KEY}}
-        #   JWT_SECRET_KEY: ${{secrets.JWT_SECRET_KEY}}
-        #   AWS_ACCESS_KEY_ID: ${{secrets.AWS_ACCESS_KEY_ID}}
-        #   AWS_SECRET_ACCESS_KEY: ${{secrets.AWS_SECRET_ACCESS_KEY}}
+        env:
+          SECRET_KEY: ${{secrets.SECRET_KEY}}
+          JWT_SECRET_KEY: ${{secrets.JWT_SECRET_KEY}}
+          AWS_ACCESS_KEY_ID: ${{secrets.AWS_ACCESS_KEY_ID}}
+          AWS_SECRET_ACCESS_KEY: ${{secrets.AWS_SECRET_ACCESS_KEY}}
 
       - name: Build Docker Compose
         run: docker-compose
+
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ap-northeast-2
+          role-to-assume: arn:aws:iam::813621738328:role/jinttoRole
+          role-session-name: jinttoRoleSessionName
 
       - name: Login to Amazon ECR
         id: login-ecr
