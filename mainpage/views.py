@@ -32,13 +32,12 @@ AWS_S3_REGION = settings.AWS_S3_REGION
 
 # S3 버킷 및 객체 키 설정
 S3_BUCKET_NAME = settings.AWS_STORAGE_BUCKET_NAME
-ASSET_OBJECT_KEY = 'data/asset_df.csv'
+ASSET_OBJECT_KEY = 'data/asset_df_final.csv'
 TIME_VIEW_OBJECT_KEY = 'data/time_view_df.csv'
 SUBSR_MAX_OBJECT_KEY = 'data/subsr_max_genre.csv'
 VOD_OBJECT_KEY = "data/vod_df.csv"
 CONTENT_SIM_OJECT_KEY = "data/contents_sim.csv"
 MODEL_KEY = "model"
-
 
 def read_data_from_s3(bucket_name, object_key):
     try:
@@ -63,11 +62,27 @@ def load_recommendation_model_from_s3(bucket_name, model_key):
 
     return model
 
+# 로컬로 데이터 읽는 코드
+# def read_data_from_local(file_name):
+#     try:
+#         file_path = os.path.join('static', file_name)
+#         data = pd.read_csv(file_path, encoding='euc-kr')
+        
+#         # NaN 값을 적절한 값으로 대체
+#         data = data.fillna(value={'disp_rtm': "null", "series_nm":"null"})  # your_column_name과 your_default_value를 적절히 수정'''
+        
+#         print(f'Successfully read data from: {file_path}')
+#         sample_data = data.head(1)
+#         print(f"Sample data: {sample_data}")  # 변경된 부분
+#         return data
+#     except Exception as e:
+#         print(f'Error reading data from local file: {e}')
+#         raise e  
+
 
 # recommendation_1 : 시간대 인기차트 프로그램명이 저장된 데이터를 부르는 함수    
 def get_assets_by_time(server_time, hashtag=None):
     time_view_df = read_data_from_s3(S3_BUCKET_NAME, TIME_VIEW_OBJECT_KEY)
-    
     if hashtag is None or hashtag == 1:
         server_hour = server_time.hour
         selected_data = time_view_df[time_view_df['time_range'] == server_hour]['top_asset']
@@ -124,6 +139,7 @@ def get_most_watched_genre(subsr):
 # recommendation_2 : 예외처리를 위한 랜덤 뽑아주기
 def get_random_programs(num_programs):
     program_data =  read_data_from_s3(S3_BUCKET_NAME, ASSET_OBJECT_KEY)
+    # program_data = read_data_from_local('asset_df_total.csv')
     try:
         if not program_data.empty:
             selected_programs = program_data.sample(min(num_programs, len(program_data)))
@@ -222,6 +238,8 @@ class RecommendationView_3(View):
                 return JsonResponse({'error': 'Failed to load the recommendation model'}, status=500)
             vod_df=read_data_from_s3(S3_BUCKET_NAME, VOD_OBJECT_KEY)
             asset_df=read_data_from_s3(S3_BUCKET_NAME, ASSET_OBJECT_KEY)
+            # vod_df = read_data_from_local('vod_df.csv')
+            # asset_df = read_data_from_local('asset_df_total.csv')
             programs = get_user_recommendations(subsr=subsr, vod_df=vod_df, asset_df=asset_df, model=recommendation_model)
             if programs.empty:
                 return JsonResponse({'error': 'No programs available'}, status=404)
@@ -257,6 +275,7 @@ class RecommendationView_4(View):
             asset_nm = vod_log.loc[vod_log['datetime'].idxmax(), 'asset_nm']
             
             cos_sim = read_data_from_s3(S3_BUCKET_NAME, CONTENT_SIM_OJECT_KEY)
+            # cos_sim = read_data_from_local('contents_sim.csv')
             if cos_sim is not None:
                 print(f"cos_sim not none!")
                 programs_str = cos_sim[cos_sim['asset_nm'] == asset_nm]['similar_assets'].iloc[0]
@@ -282,6 +301,7 @@ class SearchVeiw(View):
     def post(self, request):
         try:
             data = json.loads(request.body)
+            print("데이터는 불러왔어요!!!!!!!")
             subsr = data.get('subsr', None)
             program_to_search = data.get('programName', None) 
             print(f"program_to_search:", {program_to_search})
@@ -289,11 +309,13 @@ class SearchVeiw(View):
                 return JsonResponse({'error': 'program_to_search is missing'}, status=400)
             try:
                 asset_df = read_data_from_s3(S3_BUCKET_NAME, ASSET_OBJECT_KEY)
+                print("S3에서 데이터 잘 가져왔어요!!!!!!!!!!!!!!!!!!")
             except Exception as e:
                 logging.exception(f"Error reading data from local file: {e}")
                 return JsonResponse({'error': 'Failed to read data file'}, status=500)
             try:
                 selected_data = asset_df[asset_df['asset_nm'].str.contains(program_to_search)]
+                print("입력값이 포함된 데이터를 찾았어요!!!!!!!!!!!")
             except KeyError:
                 return JsonResponse({'error': 'Invalid filtering condition'}, status=400)
             result_data = selected_data.where(pd.notna(selected_data), None).applymap(convert_none_to_null_1).to_dict('records')
