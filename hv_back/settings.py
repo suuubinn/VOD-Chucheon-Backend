@@ -86,10 +86,10 @@ WSGI_APPLICATION = 'hv_back.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',
-        'NAME': "jintto",
+        'NAME': "realjinttodb",
         "USER":"jintto",
-        "PASSWORD":"jintto1130",
-        "HOST":"database-new-backenddb.ctcha5snygzq.us-east-1.rds.amazonaws.com",
+        "PASSWORD":"jintto3*",
+        "HOST":"realjinttodb.ckpieg7srtvm.ap-northeast-2.rds.amazonaws.com",
         "PORT":"3306"
     }
 }
@@ -161,8 +161,8 @@ SIMPLE_JWT = {
 
 # AWS S3 설정
 # git action 시크릿으로 넣어야될 것
-AWS_ACCESS_KEY_ID = 'AKIA3235CPNMLA462M5E'
-AWS_SECRET_ACCESS_KEY = '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'
+AWS_ACCESS_KEY_ID = 'AKIA3235CPNMMR3SRYGW'
+AWS_SECRET_ACCESS_KEY = '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'
 AWS_STORAGE_BUCKET_NAME = 'jintto-s3-backend'
 AWS_S3_CUSTOM_DOMAIN = f'{AWS_STORAGE_BUCKET_NAME}.s3.amazonaws.com'
 AWS_S3_REGION = 'ap-northeast-2'
